@@ -103,32 +103,33 @@ def search_for_string():
 def browse_folder_path():
     global folder_path
     folder_path = filedialog.askdirectory()
-    folder_label.config(text="Dossier sélectionné : {}".format(folder_path))
+    folder_label.config(text="Dossier sélectionné :\n{}".format(folder_path))
 
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de chaînes dans des fichiers XML")
-window.geometry("400x200")
+window.geometry("400x250")
+window.resizable(True, True)  # Make the window resizable
 
 # Create a label and button for the folder path
-folder_label = tk.Label(window, text="Dossier sélectionné : ")
-folder_label.pack()
+folder_label = tk.Label(window, text="Dossier sélectionné :\n", wraplength=350)
+folder_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
 browse_button = tk.Button(window, text="Parcourir", command=browse_folder_path)
-browse_button.pack()
+browse_button.pack(padx=10, pady=10)
 
 # Create a label and entry for the search string
 search_label = tk.Label(window, text="Entrez le mot :")
-search_label.pack()
+search_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
 search_entry = tk.Entry(window)
-search_entry.pack()
+search_entry.pack(fill=tk.X, padx=10, pady=10)  # Fill the entry horizontally and add padding
 
 # Create a button to start the search
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
-search_button.pack()
+search_button.pack(padx=10, pady=10)
 
 # Create a label to display the search results
 result_label = tk.Label(window, text="")
-result_label.pack()
+result_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
 
 # Start the tkinter event loop
 window.mainloop()
