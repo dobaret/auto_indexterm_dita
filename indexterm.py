@@ -5,6 +5,7 @@ import os
 import re
 import unicodedata
 import tkinter as tk
+from tkinter import filedialog
 
 # Define a function to search for the string
 def search_for_string():
@@ -19,8 +20,10 @@ def search_for_string():
     # Convert the search string to lowercase to match no matter the case
     search_string = search_string.lower()
 
-    # The path to the folder containing the XML files
-    folder_path = "./sections"
+    # Check if the folder path is set
+    if not folder_path:
+        result_label.config(text="Veuillez sélectionner un dossier.")
+        return
 
     # Get a list of all DITA files in the folder
     file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
@@ -96,10 +99,22 @@ def search_for_string():
         # Example search result
         result_label.config(text="Résultat de la recherche pour '{}' : {} fichiers trouvés.".format(search_string, change_count))
 
+# Define a function to browse for the folder path
+def browse_folder_path():
+    global folder_path
+    folder_path = filedialog.askdirectory()
+    folder_label.config(text="Dossier sélectionné : {}".format(folder_path))
+
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de chaînes dans des fichiers XML")
 window.geometry("400x200")
+
+# Create a label and button for the folder path
+folder_label = tk.Label(window, text="Dossier sélectionné : ")
+folder_label.pack()
+browse_button = tk.Button(window, text="Parcourir", command=browse_folder_path)
+browse_button.pack()
 
 # Create a label and entry for the search string
 search_label = tk.Label(window, text="Entrez le mot :")
