@@ -7,8 +7,16 @@ import unicodedata
 import tkinter as tk
 from tkinter import filedialog
 
+# Define the folder_path variable
+folder_path = ""
+
 # Define a function to search for the string
 def search_for_string():
+    # Check if the folder path is set
+    if not folder_path:
+        result_label.config(text="Veuillez sélectionner un dossier.")
+        return
+
     # The string to search for, strip removes any leading or trailing whitespace from the string
     search_string = search_entry.get().strip()
 
@@ -19,11 +27,6 @@ def search_for_string():
 
     # Convert the search string to lowercase to match no matter the case
     search_string = search_string.lower()
-
-    # Check if the folder path is set
-    if not folder_path:
-        result_label.config(text="Veuillez sélectionner un dossier.")
-        return
 
     # Get a list of all DITA files in the folder
     file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
