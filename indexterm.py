@@ -59,7 +59,10 @@ def search_for_string():
                     last_index += len("</indexterm>")
 
                     # Insert the new indexterm after the last indexterm tag
-                    new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_string.capitalize() + "</indexterm>" + file_contents[last_index:]
+                    if acronym_var.get():
+                        new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_string.upper() + "</indexterm>" + file_contents[last_index:]
+                    else:
+                        new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_string.capitalize() + "</indexterm>" + file_contents[last_index:]
 
                 # If there are no existing indexterm tags, add the search string after the title or shortdesc tag
                 else:
@@ -67,7 +70,7 @@ def search_for_string():
                     if "<critdates>" in file_contents:
                         new_contents = re.sub(
                             r"<critdates>(.*)(?<!<)</critdates>",
-                            r"<critdates>\1</critdates>\n        <metadata>\n            <keywords>\n                <indexterm>" + search_string.capitalize() + "</indexterm>\n            </keywords>\n        </metadata>",
+                            r"<critdates>\1</critdates>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_string.upper() if acronym_var.get() else search_string.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>",
                             file_contents,
                             flags=re.DOTALL
                         )
@@ -75,14 +78,14 @@ def search_for_string():
                         # Use the shortdesc tag instead of the title tag
                         new_contents = re.sub(
                             r"<shortdesc>(.*)(?<!<)</shortdesc>",
-                            r"<shortdesc>\1</shortdesc>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + search_string.capitalize() + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
+                            r"<shortdesc>\1</shortdesc>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_string.upper() if acronym_var.get() else search_string.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
                             file_contents,
                             flags=re.DOTALL
                         )
                     else:
                         new_contents = re.sub(
                             r"<title>(.*)(?<!<)</title>",
-                            r"<title>\1</title>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + search_string.capitalize() + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
+                            r"<title>\1</title>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_string.upper() if acronym_var.get() else search_string.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
                             file_contents,
                             count=1
                         )
@@ -108,7 +111,7 @@ def browse_folder_path():
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de chaînes dans des fichiers XML")
-window.geometry("400x250")
+window.geometry("400x350")
 window.resizable(True, True)  # Make the window resizable
 
 # Create a label and button for the folder path
@@ -122,6 +125,11 @@ search_label = tk.Label(window, text="Entrez le mot :")
 search_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
 search_entry = tk.Entry(window)
 search_entry.pack(fill=tk.X, padx=10, pady=10)  # Fill the entry horizontally and add padding
+
+# Create a checkbox for searching acronyms
+acronym_var = tk.BooleanVar()
+acronym_checkbox = tk.Checkbutton(window, text="Acronyme", variable=acronym_var)
+acronym_checkbox.pack(fill=tk.X, padx=10, pady=5)
 
 # Create a button to start the search
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
