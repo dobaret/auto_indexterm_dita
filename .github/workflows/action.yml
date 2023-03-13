@@ -7,5 +7,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: PyInstaller Windows
-        uses: JackMcKew/pyinstaller-action-windows@v0.1.2
+      - uses: actions/checkout@v3
+
+      - name: Package Application
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: ./
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: name-of-artifact
+          path: ./windows
+
