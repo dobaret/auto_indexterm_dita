@@ -107,13 +107,17 @@ def browse_folder_path():
     global folder_path
     folder_path = filedialog.askdirectory()
 
-    # Check if the selected folder contains any DITA files
-    if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
-        result_label.config(text="Aucun fichier DITA trouvé dans le dossier sélectionné.")
-    else:
-        result_label.config(text="")
+    if folder_path:
+        # Check if the selected folder contains any DITA files
+        if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
+            result_label.config(text="Aucun fichier DITA trouvé dans le dossier sélectionné.")
+        else:
+            result_label.config(text="")
 
-    folder_label.config(text="Dossier sélectionné :\n{}".format(folder_path))
+        folder_label.config(text="Dossier sélectionné :\n{}".format(folder_path))
+    else:
+        # Do nothing if no folder is selected
+        pass
 
 # Create a tkinter window
 window = tk.Tk()
