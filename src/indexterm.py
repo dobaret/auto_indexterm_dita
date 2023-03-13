@@ -3,7 +3,6 @@
 # Modules
 import os
 import re
-import unicodedata
 import tkinter as tk
 from tkinter import filedialog
 
