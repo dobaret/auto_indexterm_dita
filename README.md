@@ -8,4 +8,4 @@ If the term is found, it adds it to the existing index terms of the file, or it 
 - [X] GUI
 - [X] PyInstaller?
 - [ ] CSV file as input?
-- [ ] Delete all ```<indexterms>```  feature
+- [X] Delete all ```<indexterms>```  feature
