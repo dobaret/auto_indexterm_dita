@@ -7,15 +7,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout du contenu du repo
+        uses: actions/checkout@v3 # checkout the repository content
+        with:
+          token: ${{ secrets.PAT }}
 
       - name: Package Application
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
           path: src
 
-      - uses: actions/upload-artifact@v3
+      - name: Sauvegarde du fichier exe
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: name-of-artifact
-          path: src/windows
-
+          commit_message: Fichier exe compilé
