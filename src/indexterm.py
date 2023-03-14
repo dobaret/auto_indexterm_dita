@@ -162,7 +162,7 @@ def on_backspace(event):
 
 # Create a tkinter window
 window = tk.Tk()
-window.iconbitmap("logo.ico")
+window.iconbitmap("src/logo.ico")
 window.title("Recherche de termes dans des fichiers DITA")
 window.geometry("400x350")
 window.resizable(True, True)  # Make the window resizable
