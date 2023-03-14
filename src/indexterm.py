@@ -27,6 +27,15 @@ def search_for_string():
     # Convert the search string to lowercase to match no matter the case
     search_terms = [term for term in search_string.split(",")]
 
+    # Check if the search string contains a comma
+    if "," in search_string:
+        acronym_var.set(0)  # Disable the acronym checkbox
+        acronym_checkbox.config(state="disabled")
+        search_entry.unbind("<KeyRelease-comma>")  # Unbind the key event for comma
+    else:
+        acronym_checkbox.config(state="normal")  # Enable the acronym checkbox
+        search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
+
     # Initialize a dictionary to store the change count for each search term
     change_counts = {term: 0 for term in search_terms}
 
@@ -136,6 +145,20 @@ def browse_folder_path():
         # Do nothing if no folder is selected
         pass
 
+def on_comma(event):
+    search_entry.unbind("<KeyRelease-comma>")  # Unbind the key event for comma
+    acronym_var.set(0)  # Disable the acronym checkbox
+    acronym_checkbox.config(state="disabled")
+
+    # Bind the key event for the backspace key
+    search_entry.bind("<KeyRelease-BackSpace>", on_backspace)
+
+def on_backspace(event):
+    # Check if the comma was removed
+    if "," not in search_entry.get():
+        search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
+        acronym_checkbox.config(state="normal")  # Enable the acronym checkbox
+
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de chaînes dans des fichiers XML")
@@ -153,6 +176,7 @@ search_label = tk.Label(window, text="Entrez le mot :")
 search_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
 search_entry = tk.Entry(window)
 search_entry.pack(fill=tk.X, padx=10, pady=10)  # Fill the entry horizontally and add padding
+search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
 
 # Create a checkbox for searching acronyms
 acronym_var = tk.BooleanVar()
