@@ -27,6 +27,9 @@ def search_for_string():
     # Convert the search string to lowercase to match no matter the case
     search_terms = [term for term in search_string.split(",")]
 
+    # Initialize a dictionary to store the change count for each search term
+    change_counts = {term: 0 for term in search_terms}
+
     # Loop through each search term
     for search_term in search_terms:
 
@@ -35,9 +38,6 @@ def search_for_string():
 
         # Get a list of all DITA files in the folder
         file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
-
-        # Initialize a counter for the number of changes for this search term
-        change_count = 0
 
         # Loop through the files in the folder
         for file_name in file_list:
@@ -50,6 +50,9 @@ def search_for_string():
                 
             # Check if the search string is in the file
             if search_term in file_contents.lower():
+
+                # Increment the count of files that contain the search term
+                change_counts[search_term.lower()] += 1
 
                 # The search string was found, so check if there are any existing indexterm tags
                 existing_indexterms = [term.lower() for term in re.findall(r"<indexterm>([^<]*)</indexterm>", file_contents)]
@@ -105,10 +108,16 @@ def search_for_string():
                         f.write(new_contents)
 
                         # Increment the change counter
-                        change_count += 1
+                        change_counts[search_term] += 1
 
-        # Example search result
-        result_label.config(text="Résultat de la recherche pour '{}' : {} fichiers trouvés.".format(search_term, change_count))
+        # Create a list of strings with the count for each search term
+        count_strings = [f"{change_counts[term.lower()]} fichier(s) modifié(s) pour '{term}'" for term in search_terms]
+
+        # Join the list into a single string with line breaks
+        count_string = "\n".join(count_strings)
+
+        # Update the result label with the count string
+        result_label.config(text=count_string)
             
 # Define a function to browse for the folder path
 def browse_folder_path():
