@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['src\\indexterm.py'],
+    ['indexterm.py'],
     pathex=[],
     binaries=[],
     datas=[],
