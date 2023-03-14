@@ -5,7 +5,7 @@ import os
 import re
 import tkinter as tk
 from tkinter import filedialog
-from tktooltip import ToolTip
+from idlelib.tooltip import Hovertip
 
 # Define the folder_path variable
 folder_path = ""
@@ -175,7 +175,7 @@ browse_button.pack(padx=10, pady=10)
 # Create a label and entry for the search string
 search_label = tk.Label(window, text="Entrez un ou plusieurs termes :")
 search_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
-ToolTip(search_label, msg="Séparez plusieurs termes par des virgules sans espaces entre les mots.")
+myTip = Hovertip(search_label,'Séparez plusieurs termes par des virgules sans espaces entre les mots.')
 
 search_entry = tk.Entry(window)
 search_entry.pack(fill=tk.X, padx=10, pady=10)  # Fill the entry horizontally and add padding
@@ -185,7 +185,7 @@ search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comm
 acronym_var = tk.BooleanVar()
 acronym_checkbox = tk.Checkbutton(window, text="Acronyme", variable=acronym_var)
 acronym_checkbox.pack(fill=tk.X, padx=10, pady=5)
-ToolTip(acronym_checkbox, msg="Si \"Acronyme\" est coché, le terme sera entièrement en majuscules. Possible avec un seul mot.")
+myTip = Hovertip(acronym_checkbox,'Si \"Acronyme\" est coché, le terme sera entièrement en majuscules. Possible avec un seul mot.')
 
 # Create a button to start the search
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
