@@ -6,5 +6,6 @@ If the term is found, it adds it to the existing index terms of the file, or it 
 
 ## TO DO
 - [X] GUI
-- [ ] PyInstaller?
-- [ ] CSV file as input
+- [X] PyInstaller?
+- [ ] CSV file as input?
+- [ ] Delete all <indexterms> feature
