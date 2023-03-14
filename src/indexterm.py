@@ -5,6 +5,7 @@ import os
 import re
 import tkinter as tk
 from tkinter import filedialog
+from tktooltip import ToolTip
 
 # Define the folder_path variable
 folder_path = ""
@@ -120,7 +121,7 @@ def search_for_string():
                         change_counts[search_term] += 1
 
         # Create a list of strings with the count for each search term
-        count_strings = [f"{change_counts[term.lower()]} fichier(s) modifié(s) pour '{term}'" for term in search_terms]
+        count_strings = [f"{change_counts[term.lower()]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
 
         # Join the list into a single string with line breaks
         count_string = "\n".join(count_strings)
@@ -161,7 +162,8 @@ def on_backspace(event):
 
 # Create a tkinter window
 window = tk.Tk()
-window.title("Recherche de chaînes dans des fichiers XML")
+window.iconbitmap("logo.ico")
+window.title("Recherche de termes dans des fichiers DITA")
 window.geometry("400x350")
 window.resizable(True, True)  # Make the window resizable
 
@@ -172,8 +174,10 @@ browse_button = tk.Button(window, text="Parcourir", command=browse_folder_path)
 browse_button.pack(padx=10, pady=10)
 
 # Create a label and entry for the search string
-search_label = tk.Label(window, text="Entrez le mot :")
+search_label = tk.Label(window, text="Entrez un ou plusieurs termes :")
 search_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
+ToolTip(search_label, msg="Séparez plusieurs termes par des virgules sans espaces entre les mots.")
+
 search_entry = tk.Entry(window)
 search_entry.pack(fill=tk.X, padx=10, pady=10)  # Fill the entry horizontally and add padding
 search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
@@ -182,6 +186,7 @@ search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comm
 acronym_var = tk.BooleanVar()
 acronym_checkbox = tk.Checkbutton(window, text="Acronyme", variable=acronym_var)
 acronym_checkbox.pack(fill=tk.X, padx=10, pady=5)
+ToolTip(acronym_checkbox, msg="Si \"Acronyme\" est coché, le terme sera entièrement en majuscules. Possible avec un seul mot.")
 
 # Create a button to start the search
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
