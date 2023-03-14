@@ -6,6 +6,7 @@ import re
 import tkinter as tk
 from tkinter import filedialog
 from idlelib.tooltip import Hovertip
+import tkinter.messagebox
 
 # Define the folder_path variable
 folder_path = ""
@@ -163,7 +164,7 @@ def on_backspace(event):
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de termes dans des fichiers DITA")
-window.geometry("400x350")
+window.geometry("400x450")
 window.resizable(True, True)  # Make the window resizable
 
 # Create a label and button for the folder path
@@ -190,6 +191,46 @@ myTip = Hovertip(acronym_checkbox,'Si \"Acronyme\" est coché, le terme sera ent
 # Create a button to start the search
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
 search_button.pack(padx=10, pady=10)
+
+# Define a function to be called when the button is clicked
+def removal():
+
+    # Check if the folder path is set
+    if not folder_path:
+        result_label.config(text="Veuillez sélectionner un dossier.")
+        return
+
+    # Prompt the user to confirm that they want to continue
+    confirmed = tkinter.messagebox.askyesno("Confirmation de suppression", "Êtes-vous sûr·e de vouloir supprimer tous les termes d'index de ce dossier ?", icon='warning')
+    if not confirmed:
+        return
+    
+    # Get a list of all DITA files in the folder
+    file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
+
+    # Loop through the files in the folder
+    for file_name in file_list:
+
+        # Open the file in read mode
+        with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
+
+            # Read the entire file as a string
+            file_contents = f.read()
+
+            # Remove all existing indexterm tags and their content
+            file_contents = re.sub(r"<indexterm>([^<]*)</indexterm>", "", file_contents)
+        
+        # Open the file in write mode
+        with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
+            
+            # Write the updated file contents to the file
+            f.write(file_contents)
+    
+    result_label.config(text="Suppression des termes d'index terminée.")
+
+# Create a big red button and pack it at the bottom of the window
+button = tk.Button(window, text="Suppression des termes d'index", bg="red", fg="white", command=removal)
+button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 # Create a label to display the search results
 result_label = tk.Label(window, text="")
