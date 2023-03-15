@@ -12,6 +12,6 @@ If the term is found, it adds it to the existing index terms of the file, or it 
 - [ ] Make the number of changes scrollable 
 
 ## Issues
-- [ ] Acronym mode works but won't display a number of changes
+- [X] Acronym mode works but won't display a number of changes
 - [X] The number of changes seems doubled most of the time
 - [ ] Edge case of selecting a folder/rechercher/acronyme where error priority is wrong
