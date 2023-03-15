@@ -17,6 +17,7 @@ def search_for_string():
     if not folder_path:
         result_label.configure(state='normal')
         clearToTextInput()
+        result_label.config(wrap="word")
         result_label.insert('1.0', "Veuillez sélectionner un dossier.")
         result_label.config(state="disabled")
         return
@@ -28,6 +29,7 @@ def search_for_string():
     if not search_string:
         result_label.configure(state='normal')
         clearToTextInput()
+        result_label.config(wrap="word")
         result_label.insert('1.0', "Vous n'avez pas entré de chaîne, veuillez réessayer.")
         result_label.config(state="disabled")
         return
@@ -133,6 +135,7 @@ def search_for_string():
         # Update the result label with the count string
         result_label.configure(state='normal')
         clearToTextInput()
+        result_label.config(wrap="word")
         result_label.insert('1.0', count_string)
         result_label.config(state="disabled")
             
@@ -146,11 +149,13 @@ def browse_folder_path():
         if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
             result_label.configure(state='normal')
             clearToTextInput()
+            result_label.config(wrap="word")
             result_label.insert('1.0', "Aucun fichier DITA trouvé dans le dossier sélectionné.")
             result_label.config(state="disabled")
         else:
             result_label.configure(state='normal')
             clearToTextInput()
+            result_label.config(wrap="word")
             result_label.insert('1.0', "")
             result_label.config(state="disabled")
 
@@ -222,6 +227,7 @@ def removal():
     if not folder_path:
         result_label.configure(state='normal')
         clearToTextInput()
+        result_label.config(wrap="word")
         result_label.insert('1.0', "Veuillez sélectionner un dossier.")
         result_label.config(state="disabled")
         return
@@ -276,6 +282,7 @@ def removal():
     
     result_label.configure(state='normal')
     clearToTextInput()
+    result_label.config(wrap="word")
     result_label.insert('1.0',"Suppression des termes d'index terminée.")
     result_label.config(state="disabled")
 
@@ -285,7 +292,7 @@ button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 #Define a function to clear the input text
 def clearToTextInput():
-   result_label.delete("1.0","end")
+    result_label.delete("1.0","end")
 
 # Create a scrollbar widget and pack it on the right side of the window
 scrollbar = tk.Scrollbar(window)
