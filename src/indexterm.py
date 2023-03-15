@@ -27,7 +27,7 @@ def search_for_string():
         return
 
     # Convert the search string to lowercase to match no matter the case
-    search_terms = [term for term in search_string.split(",")]
+    search_terms = [term.strip().lower() for term in search_string.split(",")]
 
     # Check if the search string contains a comma
     if "," in search_string:
@@ -119,7 +119,7 @@ def search_for_string():
                         change_counts[search_term] += 1
 
         # Create a list of strings with the count for each search term
-        count_strings = [f"{change_counts[term.lower()]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
+        count_strings = [f"{change_counts[term]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
 
         # Join the list into a single string with line breaks
         count_string = "\n".join(count_strings)
