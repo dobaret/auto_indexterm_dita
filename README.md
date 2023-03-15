@@ -9,7 +9,7 @@ If the term is found, it adds it to the existing index terms of the file, or it 
 - [X] PyInstaller?
 - [ ] CSV file as input?
 - [X] Delete all ```<indexterms>```  feature
-- [ ] Make the number of changes scrollable 
+- [X] Make the number of changes scrollable 
 
 ## Issues
 - [X] Acronym mode works but won't display a number of changes
