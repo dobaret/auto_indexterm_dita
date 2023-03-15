@@ -62,9 +62,6 @@ def search_for_string():
             # Check if the search string is in the file
             if search_term in file_contents.lower():
 
-                # Increment the count of files that contain the search term
-                change_counts[search_term.lower()] += 1
-
                 # The search string was found, so check if there are any existing indexterm tags
                 existing_indexterms = [term.lower() for term in re.findall(r"<indexterm>([^<]*)</indexterm>", file_contents)]
                     
