@@ -15,7 +15,10 @@ folder_path = ""
 def search_for_string():
     # Check if the folder path is set
     if not folder_path:
-        result_label.config(text="Veuillez sélectionner un dossier.")
+        result_label.configure(state='normal')
+        clearToTextInput()
+        result_label.insert('1.0', "Veuillez sélectionner un dossier.")
+        result_label.config(state="disabled")
         return
 
     # The string to search for, strip removes any leading or trailing whitespace from the string
@@ -23,7 +26,10 @@ def search_for_string():
 
     # Check if the search string is empty
     if not search_string:
-        result_label.config(text="Vous n'avez pas entré de chaîne, veuillez réessayer.")
+        result_label.configure(state='normal')
+        clearToTextInput()
+        result_label.insert('1.0', "Vous n'avez pas entré de chaîne, veuillez réessayer.")
+        result_label.config(state="disabled")
         return
 
     # Convert the search string to lowercase to match no matter the case
@@ -77,7 +83,7 @@ def search_for_string():
                         # Add the length of the closing indexterm tag to get the index immediately after it
                         last_index += len("</indexterm>")
 
-                        # Insert the new indexterm after the last indexterm tag
+                        # ('1.0', the new indexterm after the last indexterm tag
                         if acronym_var.get():
                             new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_term.upper() + "</indexterm>" + file_contents[last_index:]
                         else:
@@ -125,7 +131,10 @@ def search_for_string():
         count_string = "\n".join(count_strings)
 
         # Update the result label with the count string
-        result_label.config(text=count_string)
+        result_label.configure(state='normal')
+        clearToTextInput()
+        result_label.insert('1.0', count_string)
+        result_label.config(state="disabled")
             
 # Define a function to browse for the folder path
 def browse_folder_path():
@@ -135,11 +144,18 @@ def browse_folder_path():
     if folder_path:
         # Check if the selected folder contains any DITA files
         if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
-            result_label.config(text="Aucun fichier DITA trouvé dans le dossier sélectionné.")
+            result_label.configure(state='normal')
+            clearToTextInput()
+            result_label.insert('1.0', "Aucun fichier DITA trouvé dans le dossier sélectionné.")
+            result_label.config(state="disabled")
         else:
-            result_label.config(text="")
+            result_label.configure(state='normal')
+            clearToTextInput()
+            result_label.insert('1.0', "")
+            result_label.config(state="disabled")
 
         folder_label.config(text="Dossier sélectionné :\n{}".format(folder_path))
+
     else:
         # Do nothing if no folder is selected
         pass
@@ -204,7 +220,10 @@ def removal():
 
     # Check if the folder path is set
     if not folder_path:
-        result_label.config(text="Veuillez sélectionner un dossier.")
+        result_label.configure(state='normal')
+        clearToTextInput()
+        result_label.insert('1.0', "Veuillez sélectionner un dossier.")
+        result_label.config(state="disabled")
         return
 
     # Prompt the user to confirm that they want to continue
@@ -255,15 +274,29 @@ def removal():
             # Write the updated file contents to the file
             f.write(file_contents)
     
-    result_label.config(text="Suppression des termes d'index terminée.")
+    result_label.configure(state='normal')
+    clearToTextInput()
+    result_label.insert('1.0',"Suppression des termes d'index terminée.")
+    result_label.config(state="disabled")
 
 # Create a big red button and pack it at the bottom of the window
 button = tk.Button(window, text="Suppression des termes d'index", bg="red", fg="white", command=removal)
 button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
-# Create a label to display the search results
-result_label = tk.Label(window, text="")
-result_label.pack(fill=tk.X, padx=10, pady=10)  # Fill the label horizontally and add padding
+#Define a function to clear the input text
+def clearToTextInput():
+   result_label.delete("1.0","end")
+
+# Create a scrollbar widget and pack it on the right side of the window
+scrollbar = tk.Scrollbar(window)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Create a label to display the search results and attach it to the scrollbar
+result_label = tkinter.Text(window, yscrollcommand=scrollbar.set)
+result_label.pack(fill=tk.X, padx=10, pady=10)
+
+# Configure the scrollbar to control the label's scrolling
+scrollbar.config(command=result_label.yview)
 
 # Start the tkinter event loop
 window.mainloop()
