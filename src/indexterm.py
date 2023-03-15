@@ -192,6 +192,16 @@ myTip = Hovertip(acronym_checkbox,'Si \"Acronyme\" est coché, le terme sera ent
 search_button = tk.Button(window, text="Rechercher", command=search_for_string)
 search_button.pack(padx=10, pady=10)
 
+# Strip empty lines before specific opening tags and add a line break
+def strip_empty_lines(file_contents):
+    for section in ["body", "refbody", "conbody", "taskbody"]:
+        opening_tag = "<{}>".format(section)
+        if opening_tag in file_contents:
+            start_index = file_contents.index(opening_tag)
+            stripped_lines = [line for line in file_contents[:start_index].splitlines() if line.strip()]
+            file_contents = "\n".join(stripped_lines) + "\n" + "\t" + file_contents[start_index:]
+    return file_contents
+
 # Define a function to be called when the button is clicked
 def removal():
 
@@ -217,8 +227,30 @@ def removal():
             # Read the entire file as a string
             file_contents = f.read()
 
-            # Remove all existing indexterm tags and their content
-            file_contents = re.sub(r"<indexterm>([^<]*)</indexterm>", "", file_contents)
+            # Remove metadata section
+            if "<critdates>" in file_contents and "</critdates>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents:
+                start_index = file_contents.index("<metadata>")
+                end_index = file_contents.index("</metadata>") + len("</metadata>")
+                metadata_section = file_contents[start_index:end_index]
+                file_contents = file_contents.replace(metadata_section, "")
+
+                file_contents = strip_empty_lines(file_contents)
+            
+            elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and not "<critdates>" in file_contents:
+                start_index = file_contents.index("<prolog>")
+                end_index = file_contents.index("</prolog>") + len("</prolog>")
+                metadata_section = file_contents[start_index:end_index]
+                file_contents = file_contents.replace(metadata_section, "")
+
+                file_contents = strip_empty_lines(file_contents)
+            
+            elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and "<critdates>" in file_contents:
+                start_index = file_contents.index("<prolog>")
+                end_index = file_contents.index("</prolog>") + len("</prolog>")
+                metadata_section = file_contents[start_index:end_index]
+                file_contents = file_contents.replace(metadata_section, "")
+
+                file_contents = strip_empty_lines(file_contents)
         
         # Open the file in write mode
         with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
