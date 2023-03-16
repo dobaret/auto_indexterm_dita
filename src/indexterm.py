@@ -240,15 +240,38 @@ def removal():
             result_label.config(state="disabled")
 
         else:
-
-            # Prompt the user to confirm that they want to continue
-            confirmed = tkinter.messagebox.askyesno("Confirmation de suppression", "Êtes-vous sûr·e de vouloir supprimer tous les termes d'index de ce dossier ?", icon='warning')
-            if not confirmed:
-                return
             
             # Get a list of all DITA files in the folder
             file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
 
+            # Check if any file in the folder contains indexterms
+            has_indexterms = False
+
+            # Loop through the files in the folder
+            for file_name in file_list:
+
+                # Open the file in read mode
+                with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
+
+                    # Read the entire file as a string
+                    file_contents = f.read()
+
+                    if re.search(r"<indexterm>", file_contents, re.IGNORECASE):
+                        has_indexterms = True
+                        break
+
+            # Prompt the user to confirm that they want to continue
+            if has_indexterms:
+                confirmed = tkinter.messagebox.askyesno("Confirmation de suppression", "Êtes-vous sûr·e de vouloir supprimer tous les termes d'index de ce dossier ?", icon='warning')
+                if not confirmed:
+                    return
+                
+            else:
+                clearToTextInput()
+                result_label.insert('1.0', "Aucun terme d'index trouvé dans le dossier sélectionné.")
+                result_label.config(state="disabled")
+                return
+            
             # Loop through the files in the folder
             for file_name in file_list:
 
