@@ -13,131 +13,136 @@ folder_path = ""
 
 # Define a function to search for the string
 def search_for_string():
+
     # Check if the folder path is set
     if not folder_path:
-        result_label.configure(state='normal')
         clearToTextInput()
-        result_label.config(wrap="word")
         result_label.insert('1.0', "Veuillez sélectionner un dossier.")
         result_label.config(state="disabled")
         return
 
-    # The string to search for, strip removes any leading or trailing whitespace from the string
-    search_string = search_entry.get().strip()
-
-    # Check if the search string is empty
-    if not search_string:
-        result_label.configure(state='normal')
-        clearToTextInput()
-        result_label.config(wrap="word")
-        result_label.insert('1.0', "Vous n'avez pas entré de chaîne, veuillez réessayer.")
-        result_label.config(state="disabled")
-        return
-
-    # Convert the search string to lowercase to match no matter the case
-    search_terms = [term.strip().lower() for term in search_string.split(",")]
-
-    # Check if the search string contains a comma
-    if "," in search_string:
-        acronym_var.set(0)  # Disable the acronym checkbox
-        acronym_checkbox.config(state="disabled")
-        search_entry.unbind("<KeyRelease-comma>")  # Unbind the key event for comma
     else:
-        acronym_checkbox.config(state="normal")  # Enable the acronym checkbox
-        search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
 
-    # Initialize a dictionary to store the change count for each search term
-    change_counts = {term: 0 for term in search_terms}
+        # Check if the selected folder contains any DITA files
+        if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
+            clearToTextInput()
+            result_label.insert('1.0', "Aucun fichier DITA trouvé dans le dossier sélectionné.")
+            result_label.config(state="disabled")
+            
+        else:
 
-    # Loop through each search term
-    for search_term in search_terms:
+            # The string to search for, strip removes any leading or trailing whitespace from the string
+            search_string = search_entry.get().strip()
 
-        # Convert the search term to lowercase to match no matter the case
-        search_term = search_term.lower()
+            # Check if the search string is empty
+            if not search_string:
+                clearToTextInput()
+                result_label.insert('1.0', "Vous n'avez pas entré de chaîne, veuillez réessayer.")
+                result_label.config(state="disabled")
+                return
 
-        # Get a list of all DITA files in the folder
-        file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
+            # Convert the search string to lowercase to match no matter the case
+            search_terms = [term.strip().lower() for term in search_string.split(",")]
 
-        # Loop through the files in the folder
-        for file_name in file_list:
+            # Check if the search string contains a comma
+            if "," in search_string:
+                acronym_var.set(0)  # Disable the acronym checkbox
+                acronym_checkbox.config(state="disabled")
+                search_entry.unbind("<KeyRelease-comma>")  # Unbind the key event for comma
+            else:
+                acronym_checkbox.config(state="normal")  # Enable the acronym checkbox
+                search_entry.bind("<KeyRelease-comma>", on_comma)  # Bind the key event for comma
 
-            # Open the file in read mode
-            with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
+            # Initialize a dictionary to store the change count for each search term
+            change_counts = {term: 0 for term in search_terms}
 
-                # Read the entire file as a string
-                file_contents = f.read()
-                
-            # Check if the search string is in the file
-            if search_term in file_contents.lower():
+            # Loop through each search term
+            for search_term in search_terms:
 
-                # The search string was found, so check if there are any existing indexterm tags
-                existing_indexterms = [term.lower() for term in re.findall(r"<indexterm>([^<]*)</indexterm>", file_contents)]
-                    
-                # If the search string is not in the list of existing indexterms, then,
-                if search_term not in existing_indexterms:
+                # Convert the search term to lowercase to match no matter the case
+                search_term = search_term.lower()
 
-                    # If there are existing indexterm tags, add the search string after the last one
-                    if len(existing_indexterms) > 0:
+                # Get a list of all DITA files in the folder
+                file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
 
-                        # Get the index of the last indexterm tag
-                        last_index = file_contents.find("</indexterm>")
+                # Loop through the files in the folder
+                for file_name in file_list:
 
-                        # Add the length of the closing indexterm tag to get the index immediately after it
-                        last_index += len("</indexterm>")
+                    # Open the file in read mode
+                    with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
 
-                        # ('1.0', the new indexterm after the last indexterm tag
-                        if acronym_var.get():
-                            new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_term.upper() + "</indexterm>" + file_contents[last_index:]
-                        else:
-                            new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_term.capitalize() + "</indexterm>" + file_contents[last_index:]
-
-                    # If there are no existing indexterm tags, add the search string after the title or shortdesc tag
-                    else:
-                        # Check if the shortdesc tag is present in the file
-                        if "<critdates>" in file_contents:
-                            new_contents = re.sub(
-                                r"<critdates>(.*)(?<!<)</critdates>",
-                                r"<critdates>\1</critdates>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>",
-                                file_contents,
-                                flags=re.DOTALL
-                            )
-                        elif "<shortdesc>" in file_contents:
-                            # Use the shortdesc tag instead of the title tag
-                            new_contents = re.sub(
-                                r"<shortdesc>(.*)(?<!<)</shortdesc>",
-                                r"<shortdesc>\1</shortdesc>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
-                                file_contents,
-                                flags=re.DOTALL
-                            )
-                        else:
-                            new_contents = re.sub(
-                                r"<title>(.*)(?<!<)</title>",
-                                r"<title>\1</title>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
-                                file_contents,
-                                count=1
-                            )
-
-                    # Open the file in write mode
-                    with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
+                        # Read the entire file as a string
+                        file_contents = f.read()
                         
-                        # Write the updated file contents to the file
-                        f.write(new_contents)
+                    # Check if the search string is in the file
+                    if search_term in file_contents.lower():
 
-                        # Increment the change counter
-                        change_counts[search_term] += 1
+                        # The search string was found, so check if there are any existing indexterm tags
+                        existing_indexterms = [term.lower() for term in re.findall(r"<indexterm>([^<]*)</indexterm>", file_contents)]
+                            
+                        # If the search string is not in the list of existing indexterms, then,
+                        if search_term not in existing_indexterms:
 
-        # Create a list of strings with the count for each search term
-        count_strings = [f"{change_counts[term]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
+                            # If there are existing indexterm tags, add the search string after the last one
+                            if len(existing_indexterms) > 0:
 
-        # Join the list into a single string with line breaks
-        count_string = "\n".join(count_strings)
+                                # Get the index of the last indexterm tag
+                                last_index = file_contents.find("</indexterm>")
 
-        # Update the result label with the count string
-        result_label.configure(state='normal')
-        clearToTextInput()
-        result_label.config(wrap="word")
-        result_label.insert('1.0', count_string)
-        result_label.config(state="disabled")
+                                # Add the length of the closing indexterm tag to get the index immediately after it
+                                last_index += len("</indexterm>")
+
+                                # ('1.0', the new indexterm after the last indexterm tag
+                                if acronym_var.get():
+                                    new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_term.upper() + "</indexterm>" + file_contents[last_index:]
+                                else:
+                                    new_contents = file_contents[:last_index] + "\n                <indexterm>" + search_term.capitalize() + "</indexterm>" + file_contents[last_index:]
+
+                            # If there are no existing indexterm tags, add the search string after the title or shortdesc tag
+                            else:
+                                # Check if the shortdesc tag is present in the file
+                                if "<critdates>" in file_contents:
+                                    new_contents = re.sub(
+                                        r"<critdates>(.*)(?<!<)</critdates>",
+                                        r"<critdates>\1</critdates>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>",
+                                        file_contents,
+                                        flags=re.DOTALL
+                                    )
+                                elif "<shortdesc>" in file_contents:
+                                    # Use the shortdesc tag instead of the title tag
+                                    new_contents = re.sub(
+                                        r"<shortdesc>(.*)(?<!<)</shortdesc>",
+                                        r"<shortdesc>\1</shortdesc>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
+                                        file_contents,
+                                        flags=re.DOTALL
+                                    )
+                                else:
+                                    new_contents = re.sub(
+                                        r"<title>(.*)(?<!<)</title>",
+                                        r"<title>\1</title>\n    <prolog>\n        <metadata>\n            <keywords>\n                <indexterm>" + (search_term.upper() if acronym_var.get() else search_term.capitalize()) + "</indexterm>\n            </keywords>\n        </metadata>\n    </prolog>",
+                                        file_contents,
+                                        count=1
+                                    )
+
+                            # Open the file in write mode
+                            with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
+                                
+                                # Write the updated file contents to the file
+                                f.write(new_contents)
+
+                                # Increment the change counter
+                                change_counts[search_term] += 1
+
+                # Create a list of strings with the count for each search term
+                count_strings = [f"{change_counts[term]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
+
+                # Join the list into a single string with line breaks
+                count_string = "\n".join(count_strings)
+
+                # Update the result label with the count string
+                clearToTextInput()
+                result_label.insert('1.0', count_string)
+                result_label.config(state="disabled")
             
 # Define a function to browse for the folder path
 def browse_folder_path():
@@ -147,15 +152,11 @@ def browse_folder_path():
     if folder_path:
         # Check if the selected folder contains any DITA files
         if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
-            result_label.configure(state='normal')
             clearToTextInput()
-            result_label.config(wrap="word")
             result_label.insert('1.0', "Aucun fichier DITA trouvé dans le dossier sélectionné.")
             result_label.config(state="disabled")
         else:
-            result_label.configure(state='normal')
             clearToTextInput()
-            result_label.config(wrap="word")
             result_label.insert('1.0', "")
             result_label.config(state="disabled")
 
@@ -225,66 +226,72 @@ def removal():
 
     # Check if the folder path is set
     if not folder_path:
-        result_label.configure(state='normal')
         clearToTextInput()
-        result_label.config(wrap="word")
         result_label.insert('1.0', "Veuillez sélectionner un dossier.")
         result_label.config(state="disabled")
         return
-
-    # Prompt the user to confirm that they want to continue
-    confirmed = tkinter.messagebox.askyesno("Confirmation de suppression", "Êtes-vous sûr·e de vouloir supprimer tous les termes d'index de ce dossier ?", icon='warning')
-    if not confirmed:
-        return
     
-    # Get a list of all DITA files in the folder
-    file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
+    if folder_path:
 
-    # Loop through the files in the folder
-    for file_name in file_list:
+        # Check if the selected folder contains any DITA files
+        if not any(f.endswith(".dita") for f in os.listdir(folder_path)):
+            clearToTextInput()
+            result_label.insert('1.0', "Aucun fichier DITA trouvé dans le dossier sélectionné.")
+            result_label.config(state="disabled")
 
-        # Open the file in read mode
-        with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
+        else:
 
-            # Read the entire file as a string
-            file_contents = f.read()
-
-            # Remove metadata section
-            if "<critdates>" in file_contents and "</critdates>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents:
-                start_index = file_contents.index("<metadata>")
-                end_index = file_contents.index("</metadata>") + len("</metadata>")
-                metadata_section = file_contents[start_index:end_index]
-                file_contents = file_contents.replace(metadata_section, "")
-
-                file_contents = strip_empty_lines(file_contents)
+            # Prompt the user to confirm that they want to continue
+            confirmed = tkinter.messagebox.askyesno("Confirmation de suppression", "Êtes-vous sûr·e de vouloir supprimer tous les termes d'index de ce dossier ?", icon='warning')
+            if not confirmed:
+                return
             
-            elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and not "<critdates>" in file_contents:
-                start_index = file_contents.index("<prolog>")
-                end_index = file_contents.index("</prolog>") + len("</prolog>")
-                metadata_section = file_contents[start_index:end_index]
-                file_contents = file_contents.replace(metadata_section, "")
+            # Get a list of all DITA files in the folder
+            file_list = [f for f in os.listdir(folder_path) if f.endswith(".dita")]
 
-                file_contents = strip_empty_lines(file_contents)
-            
-            elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and "<critdates>" in file_contents:
-                start_index = file_contents.index("<prolog>")
-                end_index = file_contents.index("</prolog>") + len("</prolog>")
-                metadata_section = file_contents[start_index:end_index]
-                file_contents = file_contents.replace(metadata_section, "")
+            # Loop through the files in the folder
+            for file_name in file_list:
 
-                file_contents = strip_empty_lines(file_contents)
-        
-        # Open the file in write mode
-        with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
+                # Open the file in read mode
+                with open(os.path.join(folder_path, file_name), "r", encoding="utf-8") as f:
+
+                    # Read the entire file as a string
+                    file_contents = f.read()
+
+                    # Remove metadata section
+                    if "<critdates>" in file_contents and "</critdates>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents:
+                        start_index = file_contents.index("<metadata>")
+                        end_index = file_contents.index("</metadata>") + len("</metadata>")
+                        metadata_section = file_contents[start_index:end_index]
+                        file_contents = file_contents.replace(metadata_section, "")
+
+                        file_contents = strip_empty_lines(file_contents)
+                    
+                    elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and not "<critdates>" in file_contents:
+                        start_index = file_contents.index("<prolog>")
+                        end_index = file_contents.index("</prolog>") + len("</prolog>")
+                        metadata_section = file_contents[start_index:end_index]
+                        file_contents = file_contents.replace(metadata_section, "")
+
+                        file_contents = strip_empty_lines(file_contents)
+                    
+                    elif "<prolog>" in file_contents and "</prolog>" in file_contents and "<metadata>" in file_contents and "</metadata>" in file_contents and "<critdates>" in file_contents:
+                        start_index = file_contents.index("<prolog>")
+                        end_index = file_contents.index("</prolog>") + len("</prolog>")
+                        metadata_section = file_contents[start_index:end_index]
+                        file_contents = file_contents.replace(metadata_section, "")
+
+                        file_contents = strip_empty_lines(file_contents)
+                
+                # Open the file in write mode
+                with open(os.path.join(folder_path, file_name), "w", encoding="utf-8") as f:
+                    
+                    # Write the updated file contents to the file
+                    f.write(file_contents)
             
-            # Write the updated file contents to the file
-            f.write(file_contents)
-    
-    result_label.configure(state='normal')
-    clearToTextInput()
-    result_label.config(wrap="word")
-    result_label.insert('1.0',"Suppression des termes d'index terminée.")
-    result_label.config(state="disabled")
+            clearToTextInput()
+            result_label.insert('1.0',"Suppression des termes d'index terminée.")
+            result_label.config(state="disabled")
 
 # Create a big red button and pack it at the bottom of the window
 button = tk.Button(window, text="Suppression des termes d'index", bg="red", fg="white", command=removal)
@@ -292,7 +299,9 @@ button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 #Define a function to clear the input text
 def clearToTextInput():
+    result_label.configure(state='normal')
     result_label.delete("1.0","end")
+    result_label.config(wrap="word")
 
 # Create a scrollbar widget and pack it on the right side of the window
 scrollbar = tk.Scrollbar(window)
