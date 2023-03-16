@@ -14,4 +14,4 @@ If the term is found, it adds it to the existing index terms of the file, or it 
 ## Issues
 - [X] Acronym mode works but won't display a number of changes
 - [X] The number of changes seems doubled most of the time
-- [ ] Edge case of selecting a folder/rechercher/acronyme where error priority is wrong
+- [X] Edge case of selecting a folder/rechercher/acronyme where error priority is wrong
