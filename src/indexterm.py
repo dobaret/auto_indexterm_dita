@@ -185,6 +185,7 @@ window = tk.Tk()
 window.title("Recherche de termes dans des fichiers DITA")
 window.geometry("400x450")
 window.resizable(True, True)  # Make the window resizable
+window.minsize(400, 450)  # Set the minimum size of the window to the current size
 
 # Create a label and button for the folder path
 folder_label = tk.Label(window, text="Dossier sélectionné :\n", wraplength=350)
