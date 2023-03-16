@@ -182,7 +182,7 @@ def on_backspace(event):
 
 # Create a tkinter window
 window = tk.Tk()
-window.title("Recherche de termes dans des fichiers DITA")
+window.title("Recherche de termes d'index dans des fichiers DITA")
 window.geometry("400x450")
 window.resizable(True, True)  # Make the window resizable
 window.minsize(400, 450)  # Set the minimum size of the window to the current size
