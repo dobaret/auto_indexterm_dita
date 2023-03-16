@@ -183,9 +183,9 @@ def on_backspace(event):
 # Create a tkinter window
 window = tk.Tk()
 window.title("Recherche de termes d'index dans des fichiers DITA")
-window.geometry("400x450")
+window.geometry("450x450")
 window.resizable(True, True)  # Make the window resizable
-window.minsize(400, 450)  # Set the minimum size of the window to the current size
+window.minsize(450, 450)  # Set the minimum size of the window to the current size
 
 # Create a label and button for the folder path
 folder_label = tk.Label(window, text="Dossier sélectionné :\n", wraplength=350)
