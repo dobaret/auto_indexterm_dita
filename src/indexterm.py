@@ -133,8 +133,12 @@ def search_for_string():
                                 # Increment the change counter
                                 change_counts[search_term] += 1
 
-                # Create a list of strings with the count for each search term
-                count_strings = [f"{change_counts[term]} fichier(s) modifié(s) pour \"{term}\"" for term in search_terms]
+                count_strings = []
+                for term in search_terms:
+                    if change_counts[term] == 1:
+                        count_strings.append(f"{change_counts[term]} fichier modifié pour \"{term}\"")
+                    else:
+                        count_strings.append(f"{change_counts[term]} fichiers modifiés pour \"{term}\"")
 
                 # Join the list into a single string with line breaks
                 count_string = "\n".join(count_strings)
