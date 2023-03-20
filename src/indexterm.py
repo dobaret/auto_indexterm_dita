@@ -135,7 +135,7 @@ def search_for_string():
 
                 count_strings = []
                 for term in search_terms:
-                    if change_counts[term] == 1:
+                    if change_counts[term] == 1 or change_counts[term] == 0:
                         count_strings.append(f"{change_counts[term]} fichier modifié pour \"{term}\"")
                     else:
                         count_strings.append(f"{change_counts[term]} fichiers modifiés pour \"{term}\"")
